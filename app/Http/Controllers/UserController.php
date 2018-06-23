@@ -8,6 +8,11 @@ use App\Models\User;
 use App\Handlers\ImageUploadHandler;
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        //对于未登录的用户只可以查看列表页，不可以编辑和更新
+        $this->middleware('auth', ['except' => 'show']);
+    }
     //
     public function show(User $user)
     {
@@ -16,11 +21,17 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        //权限控制
+        $this->authorize('update', $user);
         return view('users.edit', compact('user'));
     }
 
     public function update(UserRequest $request, User $user, ImageUploadHandler $uploader)
     {
+
+        //权限控制
+        $this->authorize('update', $user);
+
         $data = $request->all();
 
         if($request->avatar) {
