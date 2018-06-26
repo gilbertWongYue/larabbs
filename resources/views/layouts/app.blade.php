@@ -16,7 +16,7 @@
 
 <body>
     <div id="app" class="{{ route_class() }}-page">
-        {{--route_class:当前的路由,如：user.show ,转化后为user-show  --}}
+        <!--route_class:当前的路由,如：user.show ,转化后为user-show  -->
         @include('layouts._header')
 
         <div class="container">

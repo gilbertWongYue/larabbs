@@ -25,6 +25,7 @@
             <!-- Right Side Of Navbar -->
             <ul class="nav navbar-nav navbar-right">
                 <!-- Authentication Links -->
+                {{-- @guest : 判断用户是否为访客  @auth ：检测用户是否认证 --}}
                 @guest
 
                     <li><a href="{{ route('login') }}">登录</a></li>
