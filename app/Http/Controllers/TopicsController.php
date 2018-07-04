@@ -6,11 +6,14 @@ use App\Models\Topic;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TopicRequest;
+use App\Models\Category;
+use Auth;
 
 class TopicsController extends Controller
 {
     public function __construct()
     {
+        //检查权限，未登录用户只能查看内容，不可修改和发帖
         $this->middleware('auth', ['except' => ['index', 'show']]);
     }
 
@@ -25,14 +28,17 @@ class TopicsController extends Controller
         return view('topics.show', compact('topic'));
     }
 
-	public function create(Topic $topic)
+	public function create(Topic $topic, Category $category)
 	{
-		return view('topics.create_and_edit', compact('topic'));
+        $categories = $category->all();
+		return view('topics.create_and_edit', compact('topic', 'categories'));
 	}
 
-	public function store(TopicRequest $request)
+	public function store(TopicRequest $request, Topic $topic)
 	{
-		$topic = Topic::create($request->all());
+		$topic->fill($request->all());
+        $topic->user_id = Auth::id();
+        $topic->save();
 		return redirect()->route('topics.show', $topic->id)->with('message', 'Created successfully.');
 	}
 
