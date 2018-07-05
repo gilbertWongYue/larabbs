@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TopicRequest;
 use App\Models\Category;
 use Auth;
+use App\Handlers\ImageUploadHandler;
 
 class TopicsController extends Controller
 {
@@ -30,6 +31,7 @@ class TopicsController extends Controller
 
 	public function create(Topic $topic, Category $category)
 	{
+        // dd($category::all());
         $categories = $category->all();
 		return view('topics.create_and_edit', compact('topic', 'categories'));
 	}
@@ -39,7 +41,7 @@ class TopicsController extends Controller
 		$topic->fill($request->all());
         $topic->user_id = Auth::id();
         $topic->save();
-		return redirect()->route('topics.show', $topic->id)->with('message', 'Created successfully.');
+		return redirect()->route('topics.show', $topic->id)->with('success', 'Created successfully.');
 	}
 
 	public function edit(Topic $topic)
@@ -53,7 +55,7 @@ class TopicsController extends Controller
 		$this->authorize('update', $topic);
 		$topic->update($request->all());
 
-		return redirect()->route('topics.show', $topic->id)->with('message', 'Updated successfully.');
+		return redirect()->route('topics.show', $topic->id)->with('success', 'Updated successfully.');
 	}
 
 	public function destroy(Topic $topic)
@@ -61,6 +63,28 @@ class TopicsController extends Controller
 		$this->authorize('destroy', $topic);
 		$topic->delete();
 
-		return redirect()->route('topics.index')->with('message', 'Deleted successfully.');
+		return redirect()->route('topics.index')->with('success', 'Deleted successfully.');
 	}
+
+    public function uploadImage(Request $request, ImageUploadHandler $uploader)
+    {
+        //初始化返回数据
+        $data = [
+            'success' => false,
+            'msg'     => '上传失败',
+            'file_path' => ''
+        ];
+        //判断是否有上传文件
+        if ($file = $request->upload_file) {
+            //保存图片到本地
+            $result = $uploader->save($request->upload_file, 'topics', \Auth::id(), 512);
+
+            if ($result) {
+                $data['success'] = true;
+                $data['msg']     = '上传成功';
+                $data['file_path'] = $result['path'];
+            }
+        }
+        return $data;
+    }
 }

@@ -36,7 +36,7 @@ class UserController extends Controller
         $data = $request->all();
 
         if($request->avatar) {
-            $result = $uploader->save($request->avatar, 'avatar', $user->id, 362);
+            $result = $uploader->save($request->avatar, 'avatar', $user->id, 362);//362为设置的图片宽度
             if($result) {
                 //将图片保存的路径返回
                 $data['avatar'] = $result['path'];
